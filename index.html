@@ -1,84 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Place Address Finder</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=<Your key>&libraries=places"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directions Finder</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin: 20px;
+      margin: 0;
+      padding: 20px;
     }
-    #results {
+    #map {
+      width: 100%;
+      height: 500px;
       margin-top: 20px;
-      max-width: 600px;
-      text-align: left;
-      margin-left: auto;
-      margin-right: auto;
     }
-    .place {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
     }
   </style>
 </head>
 <body>
-  <h2> Place Address Finder</h2>
-  <input type="text" id="query" placeholder="Search (e.g., Starbucks)" value="Starbucks">
-  <input type="text" id="location" placeholder="Location (e.g., Bangalore)" value="Bangalore">
-  <button onclick="searchPlaces()">Search</button>
-
-  <div id="results"></div>
+  <h2> Directions Finder</h2>
+  
+  <input type="text" id="origin" placeholder="Enter Origin" value="Hyderabad">
+  <input type="text" id="destination" placeholder="Enter Destination" value="Charminar Hyderabad">
+  
+  <select id="mode">
+    <option value="driving">Driving</option>
+    <option value="walking">Walking</option>
+    <option value="bicycling">Bicycling</option>
+    <option value="transit">Transit</option>
+  </select>
+  
+  <button onclick="loadMap()">Get Directions</button>
+  
+  <div id="map">
+    <!-- Map will load here -->
+  </div>
 
   <script>
-    let map;
-    let service;
-    let geocoder;
+    function loadMap() {
+      const origin = document.getElementById("origin").value;
+      const destination = document.getElementById("destination").value;
+      const mode = document.getElementById("mode").value;
+      const apiKey = "YOUR_API_KEY"; // Replace with your real API Key
 
-    function initMap() {
-      geocoder = new google.maps.Geocoder();
+      const mapFrame = `
+        <iframe
+          width="100%"
+          height="500"
+          style="border:0"
+          loading="lazy"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyAAX9FCvvGGpKLr_qw_hjpJ5bosr6IT1Hw&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&mode=${mode}">
+        </iframe>
+      `;
+
+      document.getElementById("map").innerHTML = mapFrame;
     }
 
-    function searchPlaces() {
-      const query = document.getElementById("query").value;
-      const location = document.getElementById("location").value;
-
-      geocoder.geocode({ address: location }, function(results, status) {
-        if (status !== "OK") {
-          alert("Geocode failed: " + status);
-          return;
-        }
-
-        const loc = results[0].geometry.location;
-
-        service = new google.maps.places.PlacesService(document.createElement('div'));
-
-        const request = {
-          query: query,
-          location: loc,
-          radius: 5000
-        };
-
-        service.textSearch(request, function(results, status) {
-          if (status !== google.maps.places.PlacesServiceStatus.OK) {
-            alert("Places search failed: " + status);
-            return;
-          }
-
-          const resultsDiv = document.getElementById("results");
-          resultsDiv.innerHTML = "";
-
-          results.forEach(place => {
-            const div = document.createElement("div");
-            div.className = "place";
-            div.innerHTML = `<strong>${place.name}</strong><br>${place.formatted_address}`;
-            resultsDiv.appendChild(div);
-          });
-        });
-      });
-    }
-
-    window.onload = initMap;
+    // Load default map on start
+    window.onload = loadMap;
   </script>
 </body>
 </html>
+
